@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+  <title>Youtube-dl Metadata Server | owdevel</title>
+
+  <meta charset="UTF-8">
+  <meta name="language" content="en">
+  <meta name="description" content="Creating small script for converting json to nfo">
+  <meta name="keywords" content="youtube-dl , nfo , json , media">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  
+  
+
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" />
+
+  
+  
+    
+ 
+  
+  
+  
+  
+  
+  
+    
+    <link type="text/css" rel="stylesheet" href="/css/post.min.2cb93c91050d1853bf971cc31e00122edd6e0f405aa1de3b7f8ef67ea3b5a79a.css" integrity="sha256-LLk8kQUNGFO/lxzDHgASLt1uD0Baod47f472fqO1p5o="/>
+  
+    
+    <link type="text/css" rel="stylesheet" href="/css/custom.min.e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" integrity="sha256-47DEQpj8HBSa&#43;/TImW&#43;5JCeuQeRkm5NMpJWZG3hSuFU="/>
+  
+  
+   
+   
+    
+
+<script type="application/ld+json">
+  
+    {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/owdevel.github.io\/"
+      },
+      "articleSection" : "blog",
+      "name" : "Youtube-dl Metadata Server",
+      "headline" : "Youtube-dl Metadata Server",
+      "description" : "Creating small script for converting json to nfo",
+      "inLanguage" : "en-US",
+      "author" : "",
+      "creator" : "",
+      "publisher": "",
+      "accountablePerson" : "",
+      "copyrightHolder" : "",
+      "copyrightYear" : "2021",
+      "datePublished": "2021-03-02 21:03:40 \u002b1100 AEDT",
+      "dateModified" : "2021-03-02 21:03:40 \u002b1100 AEDT",
+      "url" : "https:\/\/owdevel.github.io\/blog\/youtube-dl_metadata_server\/",
+      "wordCount" : "525",
+      "keywords" : ["youtube-dl", "nfo", "json", "media", "Blog"]
+    }
+  
+  </script>
+</head>
+
+<body>
+  <div class="burger__container">
+  <div class="burger" aria-controls="navigation" aria-label="Menu">
+    <div class="burger__meat burger__meat--1"></div>
+    <div class="burger__meat burger__meat--2"></div>
+    <div class="burger__meat burger__meat--3"></div>
+  </div>
+</div>
+ 
+
+  <nav class="nav" id="navigation">
+  <ul class="nav__list">
+    
+    
+      <li>
+        <a  href="/">about</a>
+      </li>
+    
+      <li>
+        <a  class="active"
+         href="/blog">blog</a>
+      </li>
+    
+  </ul>
+</nav>
+
+
+  <main>
+    
+    
+
+    <div class="flex-wrapper">
+      <div class="post__container">
+        <div class="post">
+          <header class="post__header">
+            <h1 id="post__title">Youtube-dl Metadata Server</h1>
+            <time datetime="2021-03-02 21:03:40 &#43;1100 AEDT" class="post__date">Mar 2 2021</time> 
+          </header>
+          <article class="post__content">
+              
+<h2 id="metadata">METAdata<a class="anchor" href="#metadata">#</a></h2>
+<p>I&rsquo;ve grown to use <a href="https://github.com/ytdl-org/youtube-dl">youtube-dl</a> a lot as a useful tool for archiving old footage from youtube as well as saving content for offline viewing. It really complements home server setups using Plex and Jellyfin, with one small caveat - metadata.</p>
+<p>Scraping metadata from sites after downloading can be difficult, especially as the descriptions may change and/or videos get removed. Luckily youtube-dl comes with a handy flag <code>--write-info-json</code> that saves the metadata at the time of download. This file format cannot be read by Jellyfin/Plex however as they use the Kodi .nfo xml styling. As such I decided to create a small script to do the conversion for me.</p>
+<h2 id="ytdl-nfo">ytdl-nfo<a class="anchor" href="#ytdl-nfo">#</a></h2>
+<p>youtube-dl JSON metadata to kodi-style NFO converter</p>
+<p>Github Link:
+<a href="https://github.com/owdevel/ytdl-nfo">https://github.com/owdevel/ytdl-nfo</a></p>
+<h3 id="design-considerations">Design Considerations<a class="anchor" href="#design-considerations">#</a></h3>
+<p>The tool needed to be designed in a way that it can process a series of *.json files created using youtube-dl and convert it into .nfo media compatible with Jellyfin/Plex. When creating the tool I wanted it both to be useful as a library as well as a cli tool.</p>
+<p>youtube-dl creates different metadata tags based on the extractor (website) it uses. Given this it was important that the extraction system incorporated modular configs in order to account for different variables produced by different websites</p>
+<h3 id="xml-nodes-and-yaml">XML Nodes and Yaml<a class="anchor" href="#xml-nodes-and-yaml">#</a></h3>
+<p>The .nfo xml style luckily uses one root node, which meant that it was possible to generate the containing information easily off that node recursively using python&rsquo;s xml module. The tricky part was then deciding how to structure the yaml file, and parse the values as it is read.</p>
+<p>Python to the rescue! Using the inbuilt <code>str.format(**data)</code> allows for variables to be automatically parsed into the relevant strings! This combined with date formatting for the strings allowed for very simple code generated from a simple yaml document.</p>
+<pre><code class="language-yaml"># /configs/youtube.yaml
+episodedetails:
+  - title: '{title}'
+  - showtitle: '{uploader}'
+  - uniqueid:
+      attr:
+        type: 'youtube'
+        default: 'true'
+      value: '{id}'
+  - plot: '{description}'
+  - premiered:
+      convert: 'date'
+      input_f: '%Y%m%d'
+      output_f: '%Y-%m-%d'
+      value: '{upload_date}'
+
+</code></pre>
+<h4 id="why-not-string-replace-a-xml-document">Why not string replace a xml document?</h4>
+<p>It would have been simpler to create a series of .nfo templates and just use a string replace to substitue values in, however I wanted to add some basic conversion functionality in as well, for example the date format. Eventually I would like to add tag support as well which would mean needing to iterate over a list to generate a certain xml node multiple times. This could&rsquo;ve been done in a similar fashion to Vuejs&rsquo;s <code>v-for</code> directive however that approach would&rsquo;ve added more complexity in dealing with nested data. Using yaml for configuration is cleaner in my opinion and also allows for more extensibility in the future given the full control over every node creation.</p>
+<h3 id="future-plans">Future Plans<a class="anchor" href="#future-plans">#</a></h3>
+<p>This project is still in its early stages but it is functional and has helped me organise my own personal server. It still requires decent error handling and documentation as well as many more extractors for all the possible sites. Given it was mostly a learning exercise for me, I&rsquo;ll continue to expand it as I need to but probably won&rsquo;t continue working on it much unless people request it.</p>
+
+
+              
+          </article>
+          
+
+<ul class="tags__list">
+    
+    <li class="tag__item">
+        <a class="tag__link" href="https://owdevel.github.io/tags/scripts/">scripts</a>
+    </li>
+    <li class="tag__item">
+        <a class="tag__link" href="https://owdevel.github.io/tags/python/">python</a>
+    </li>
+    <li class="tag__item">
+        <a class="tag__link" href="https://owdevel.github.io/tags/yaml/">yaml</a>
+    </li>
+    <li class="tag__item">
+        <a class="tag__link" href="https://owdevel.github.io/tags/media/">media</a>
+    </li></ul>
+
+ <div class="pagination">
+  
+    <a class="pagination__item" href="https://owdevel.github.io/blog/misty_cover/">
+        <span class="pagination__label">Previous Post</span>
+        <span class="pagination__title">Misty Cover</span>
+    </a>
+  
+
+  
+</div>
+
+          
+          <footer class="post__footer">
+            
+
+
+<div class="social-icons">
+  
+     
+    
+      <a class="social-icons__link" title="GitHub"
+         href="https://github.com/owdevel"
+         target="_blank" rel="noopener">
+        <div class="social-icons__icon" style="background-image: url('https://owdevel.github.io/svg/github.svg')"></div>
+      </a>
+    
+     
+</div>
+
+            <p>© 2021</p>
+          </footer>
+          </div>
+      </div>
+      
+    </div>
+    
+
+  </main>
+
+   
+
+  
+  <script src="/js/index.min.49e4d8a384357d9b445b87371863419937ede9fa77737522ffb633073aebfa44.js" integrity="sha256-SeTYo4Q1fZtEW4c3GGNBmTft6fp3c3Ui/7YzBzrr&#43;kQ=" crossorigin="anonymous"></script>
+  
+  
+  <script src="https://unpkg.com/prismjs@1.20.0/components/prism-core.min.js"></script>
+
+  
+  <script src="https://unpkg.com/prismjs@1.20.0/plugins/autoloader/prism-autoloader.min.js"
+    data-autoloader-path="https://unpkg.com/prismjs@1.20.0/components/"></script>
+
+  
+
+
+</body>
+
+</html>

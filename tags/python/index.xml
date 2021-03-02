@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>owdevel</title>
-    <link>https://owdevel.github.io/</link>
-    <description>Recent content on owdevel</description>
+    <title>python on owdevel</title>
+    <link>https://owdevel.github.io/tags/python/</link>
+    <description>Recent content in python on owdevel</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>© {year}</copyright>
-    <lastBuildDate>Tue, 02 Mar 2021 21:03:40 +1100</lastBuildDate><atom:link href="https://owdevel.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 02 Mar 2021 21:03:40 +1100</lastBuildDate><atom:link href="https://owdevel.github.io/tags/python/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Youtube-dl Metadata Server</title>
       <link>https://owdevel.github.io/blog/youtube-dl_metadata_server/</link>
@@ -16,17 +16,6 @@
       <guid>https://owdevel.github.io/blog/youtube-dl_metadata_server/</guid>
       <description>METAdata I&amp;rsquo;ve grown to use youtube-dl a lot as a useful tool for archiving old footage from youtube as well as saving content for offline viewing. It really complements home server setups using Plex and Jellyfin, with one small caveat - metadata.
 Scraping metadata from sites after downloading can be difficult, especially as the descriptions may change and/or videos get removed. Luckily youtube-dl comes with a handy flag --write-info-json that saves the metadata at the time of download.</description>
-    </item>
-    
-    <item>
-      <title>Misty Cover</title>
-      <link>https://owdevel.github.io/blog/misty_cover/</link>
-      <pubDate>Sat, 29 Aug 2020 13:47:55 +1000</pubDate>
-      
-      <guid>https://owdevel.github.io/blog/misty_cover/</guid>
-      <description>So I had to do a video for Unijam in under 3 hours due to some unforseen circumstances&amp;hellip; turned out better than I could&amp;rsquo;ve hoped for :D
-This is a cover of the song Misty by Erroll Garner popularised by Ella Fitzgerald
- </description>
     </item>
     
   </channel>
